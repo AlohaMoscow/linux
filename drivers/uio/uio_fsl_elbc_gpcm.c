@@ -303,7 +303,7 @@ static int uio_fsl_elbc_gpcm_probe(struct platform_device *pdev)
 	char *uio_name = NULL;
 	struct resource *res;
 	void __iomem *base;
-	unsigned int irq;
+	int irq;
 	u32 reg_br_cur;
 	u32 reg_or_cur;
 	u32 reg_br_new;
@@ -319,8 +319,10 @@ static int uio_fsl_elbc_gpcm_probe(struct platform_device *pdev)
 		return PTR_ERR(base);
 
 	/* get optional irq value */
-	irq = platform_get_irq(pdev, 0);
-	if (irq < 0)
+	irq = platform_get_irq_optional(pdev, 0);
+	if (irq == -ENXIO)
+		irq = 0;
+	else if (irq < 0)
 		return irq;
 
 	/* allocate private data */
